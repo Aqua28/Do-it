@@ -21,17 +21,16 @@ class AddTaskViewController: UIViewController {
     
     @IBAction func addTask(_ sender: Any) {
         //create new task
-        let task = Task()
+        
+        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        let task = Task(context: context)
         task.important = importantSwitch.isOn
         task.name = taskNameTextField.text!
-        
-        //add task to array in previous viewcontroller
-        previousVC.tasks.append(task)
-        previousVC.listoftasks.reloadData()
+        (UIApplication.shared.delegate as! AppDelegate).saveContext()
         
         //line of code that pops back to previous VC
         
-    navigationController?.popViewController(animated: true)
+        navigationController?.popViewController(animated: true)
     }
     
     

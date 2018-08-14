@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 class TasksViewController: UIViewController, UITableViewDelegate, UITableViewDataSource  {
 
@@ -15,12 +16,27 @@ class TasksViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     var tasks : [Task] = []
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        listoftasks.delegate = self
+        listoftasks.dataSource = self
+        
+        // Do any additional setup after loading the view, typically from a nib.
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        
+        
+        getTasks()
+        listoftasks.reloadData()
+    }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let task = tasks[indexPath.row]
         let cell = UITableViewCell()
         
         if task.important == true {
-              cell.textLabel?.text = task.name + "!!!"
+            cell.textLabel?.text = task.name! + "!!!"
         }
         else{
               cell.textLabel?.text = task.name
@@ -33,35 +49,25 @@ class TasksViewController: UIViewController, UITableViewDelegate, UITableViewDat
         return tasks.count
     }
     
-    func makeTasks() -> [Task]{
-        let task1 = Task()
-        task1.name = "Buy cheese"
-        task1.important = false
-        
-        let task2 = Task()
-        task2.name = "Dance in the rain"
-        task2.important = true
-        
-        let task3 = Task()
-        task3.name = "Stop thinking"
-        task3.important = true
-        
-        return [task1, task2, task3]
-    }
-    
-    
 
     
     
     @IBAction func addTapped(_ sender: Any) {
         performSegue(withIdentifier: "addNewSegue", sender: nil)
     }
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "addNewSegue"{
-        let nextVC = segue.destination as! AddTaskViewController
-        nextVC.previousVC = self
+    func getTasks() {
+        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        do{
+           tasks = try context.fetch(Task.fetchRequest()) as [Task]
+        } catch {
+            print("fetch request error")
         }
+        
+    }
+    
+
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+      
         if segue.identifier == "selectTask"{
             let nextVC = segue.destination as! ViewTaskViewController
             nextVC.task = sender as! Task
@@ -79,14 +85,7 @@ class TasksViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        tasks = makeTasks()
-        listoftasks.delegate = self
-        listoftasks.dataSource = self
-        
-        // Do any additional setup after loading the view, typically from a nib.
-    }
+
 
 
 }

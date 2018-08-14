@@ -24,8 +24,9 @@ class ViewTaskViewController: UIViewController {
     
     @IBAction func removeButtonTapped(_ sender: Any) {
         
-        previousVC.tasks.remove(at: previousVC.selectedRow)
-        previousVC.listoftasks.reloadData()
+        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        context.delete(task)
+        (UIApplication.shared.delegate as! AppDelegate).saveContext()
         navigationController?.popViewController(animated: true)
     }
     
